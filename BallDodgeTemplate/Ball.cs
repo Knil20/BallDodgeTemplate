@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -19,26 +20,6 @@ namespace BallDodgeTemplate
             ySpeed = _ySpeed;
         }
 
-        public void Move(string direction)
-        {
-            if (direction == "left")
-            {
-                x -= xSpeed;
-            }
-            else if (direction == "right")
-            {
-                x += xSpeed;
-            }
-
-            if (direction == "up")
-            {
-                y -= ySpeed;
-            }
-            else if (direction == "down")
-            {
-                y += ySpeed;
-            }
-        }
 
         public void Move()
         {
@@ -52,6 +33,19 @@ namespace BallDodgeTemplate
 
             if (y < 0 || y > 500 - size)
             {
+                ySpeed *= -1;
+            }
+        }
+
+        public void Collision(Player p)
+        {
+            Rectangle ballRec = new Rectangle(x, y, size, size);
+            Rectangle playerRec = new Rectangle(p.x, p.y, p.width, p.height);
+
+            if (ballRec.IntersectsWith(playerRec))
+            {
+                p.health--;
+
                 ySpeed *= -1;
             }
         }

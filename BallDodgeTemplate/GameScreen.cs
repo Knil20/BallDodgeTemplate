@@ -12,8 +12,9 @@ namespace BallDodgeTemplate
 {
     public partial class GameScreen : UserControl
     {
-        Ball hero = new Ball(100, 100, 10, 10);
+        Player hero;
         SolidBrush whiteBrush = new SolidBrush(Color.White);
+        SolidBrush limeBrush = new SolidBrush(Color.Lime);
         Boolean leftArrowDown, rightArrowDown, upArrowDown, downArrowDown;
 
         List<Ball> balls = new List<Ball>();
@@ -21,14 +22,25 @@ namespace BallDodgeTemplate
         public GameScreen()
         {
             InitializeComponent();
-            Ball enemyBall = new Ball(150, 100, 10, 10);
-            balls.Add(enemyBall);
 
-            enemyBall = new Ball(250, 250, -10, 10);
-            balls.Add(enemyBall);
 
-            enemyBall = new Ball(400, 150, 10, -10);
-            balls.Add(enemyBall);
+            hero = new Player(100, 100, 10, 10);
+            Ball enemyBall;
+            Random randGen = new Random();
+
+            for (int i = 0; i < 10; i++)
+            {
+                int x = randGen.Next(50, 400);
+                int y = randGen.Next(50, 400);
+
+                int xSpeed = randGen.Next(-10, 10);
+                int ySpeed = randGen.Next(-10, 10);
+                enemyBall = new Ball(x, y, xSpeed, ySpeed);
+                balls.Add(enemyBall);
+            }
+
+
+
 
         }
 
@@ -73,11 +85,11 @@ namespace BallDodgeTemplate
         private void gameTimer_Tick(object sender, EventArgs e)
         {
             //move hero
-            if(leftArrowDown && hero.x > 0)
+            if (leftArrowDown && hero.x > 0)
             {
                 hero.Move("left");
             }
-            else if (rightArrowDown && hero.x < this.Width - hero.size)
+            else if (rightArrowDown && hero.x < this.Width - hero.width)
             {
                 hero.Move("right");
             }
@@ -86,29 +98,36 @@ namespace BallDodgeTemplate
             {
                 hero.Move("up");
             }
-            else if(downArrowDown && hero.y < this.Height - hero.size)
+            else if (downArrowDown && hero.y < this.Height - hero.height)
             {
                 hero.Move("down");
             }
 
-            //move enemies
-            foreach(Ball b in balls)
+            //move enemies and check for collision
+            foreach (Ball b in balls)
             {
                 b.Move();
+                b.Collision(hero);
             }
-         
 
             Refresh();
         }
 
         private void GameScreen_Paint(object sender, PaintEventArgs e)
         {
-            e.Graphics.FillEllipse(whiteBrush, hero.x, hero.y, hero.size, hero.size);
+            //show health
+            healthLabel.Text = hero.health + "";
 
+            //draw hero
+            e.Graphics.FillRectangle(limeBrush, hero.x, hero.y, hero.width, hero.height);
+
+            //draw enemies
             foreach (Ball b in balls)
             {
                 e.Graphics.FillEllipse(whiteBrush, b.x, b.y, b.size, b.size);
             }
+
+
         }
     }
 }
